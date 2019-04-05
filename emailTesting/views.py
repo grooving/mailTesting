@@ -16,7 +16,7 @@ def send_email_for_grooving(request):
 
     send_mail(subject='Asunto', message='Mensaje', from_email='grupogrooving@gmail.com',
               recipient_list=['utri1990@gmail.com'], fail_silently=False,
-              auth_user='grupogrooving@gmail.com', auth_password='isppgrooving')
+              auth_user='grupogrooving@gmail.com', auth_password='94TDtF4zG2t4Cxy')
 
     return HttpResponse("Correo enviado")
 
