@@ -12,14 +12,27 @@ from django.http import HttpResponse
 
 def send_email_for_grooving(request):
 
-    # Forma 1
+    # Forma 2. con sendmail
 
-    send_mail(subject='Asunto', message='Mensaje', from_email='grupogrooving@gmail.com',
-              recipient_list=['utri1990@gmail.com'], fail_silently=False,
-              auth_user='grupogrooving@gmail.com', auth_password='94TDtF4zG2t4Cxy')
+    email = EmailMessage()
+    email.subject = 'Hello'
+    email.body = 'Body goes here'                     # Aquí va el contenido HTML
+    email.from_email = 'Grooving <no-reply@grupogrooving.com>'
+    email.to = ['utri1990@gmail.com']
+    email.attach_file('emailTesting/invoice.pdf')
+    email.send()
 
     return HttpResponse("Correo enviado")
 
+'''
+# Forma 1: funciona. Nota: para que funcione en producción, la contraseña debe ser segura.
+
+send_mail(subject='Asunto', message='Mensaje', from_email='grupogrooving@gmail.com',
+          recipient_list=['utri1990@gmail.com'], fail_silently=False,
+          auth_user='grupogrooving@gmail.com', auth_password='94TDtF4zG2t4Cxy')
+
+return HttpResponse("Correo enviado")
+'''
 
 '''
 # Forma 2: el servidor de correo lo detecta como SPAM
