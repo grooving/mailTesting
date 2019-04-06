@@ -3,13 +3,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
-
-# import os
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", 'gmail.settings')
-
-
-# Documentation based: https://docs.djangoproject.com/en/2.2/topics/email/
-
+from emailTesting.models import Offer, SystemConfiguration
 from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.lib.styles import getSampleStyleSheet
@@ -56,7 +50,7 @@ def report_template(pdf_title, content):
     return pdf
 
 
-def send_mail_payment_made():
+def generate_pdf_payment_made():
 
     # Table header
 
@@ -89,7 +83,7 @@ def send_mail_payment_made():
     students = [{'#': '1', 'name': 'Miguel Nieva',     'b1': '3.4', 'b2': '2.2', 'b3': '4.5', 'total': '3.36'},
                 {'#': '2', 'name': 'Sacha Lifszyc',    'b1': '4.3', 'b2': '2.6', 'b3': '4.6', 'total': '3.83'},
                 {'#': '3', 'name': 'Carlos Jimenez',   'b1': '2.1', 'b2': '4.3', 'b3': '4.9', 'total': '3.76'},
-                {'#': '4', 'name': 'Raquel Hernández', 'b1': '5.0', 'b2': '4.7', 'b3': '4.4', 'total': '4.7'},
+                {'#': '4', 'name': 'Raquel Hernández', 'b1': '5.0', 'b2': '4.7', 'b3': '4.4', 'total': '4.7'} ,
                 {'#': '5', 'name': 'Elizabeth Rangel', 'b1': '3.3', 'b2': '4.9', 'b3': '4.9', 'total': '4.36'}]
 
     for student in students:
@@ -109,20 +103,120 @@ def send_mail_payment_made():
     return pdf
 
 
-def send_email_for_grooving(request):
+def generate_pdf_pending_to_contract_made(offerId):
+
+    offer = Offer.objects.get(pk=offerId)
+
+    # pdf = report_template('Contract', [table, high])
+    pdf = generate_pdf_payment_made()
+
+    return pdf
+
+
+def send_email_pending_to_reject(offerId):
+
+    offer = Offer.objects.get(pk=offerId)
+
+    email = EmailMessage()
+    email.subject = 'Offer rejected'
+    email.from_email = 'Grooving <no-reply@grupogrooving.com>'
+
+    email.to = [offer.paymentPackage.portfolio.artist.user.email]
+    email.body = 'You have rejected the offer received by ' + offer.eventLocation.customer.user.get_full_name()
+    email.send()
+
+    email.to = [offer.eventLocation.customer.user.email]
+    email.body = 'The offer sent to ' + offer.paymentPackage.portfolio.artist.user.get_full_name() + ' has been rejected'
+    email.send()
+
+
+def send_email_pending_to_withdrawn(offerId):
+
+    offer = Offer.objects.get(pk=offerId)
+
+    email = EmailMessage()
+    email.subject = 'Offer withdrawn'
+    email.from_email = 'Grooving <no-reply@grupogrooving.com>'
+
+    email.to = [offer.paymentPackage.portfolio.artist.user.email]
+    email.body = 'The customer ' + offer.eventLocation.customer.user.get_full_name() + ' has withdrawn the offer'
+    email.send()
+
+    email.to = [offer.eventLocation.customer.user.email]
+    email.body = 'You have withdrawn the offer sent to ' + offer.paymentPackage.portfolio.artisticName
+    email.send()
+
+
+def send_email_pending_to_contract_made(offerId):
+
+    offer = Offer.objects.get(pk=offerId)
+    system_configuration = SystemConfiguration.objects.filter(pk=1).first()
+    pdf = generate_pdf_pending_to_contract_made(offerId)
+
+    email = EmailMessage()
+    email.subject = 'Offer accepted'
+    email.from_email = 'Grooving <no-reply@grupogrooving.com>'
+    email.attach('bill.pdf', pdf, 'application/pdf')
+    email.content_subtype = 'html'
+
+    # Artist mail
+
+    email.to = [offer.paymentPackage.portfolio.artist.user.email]
+    body = '<h1 style="color: #FFFFF; font-family: Helvetica"> Congratulations! ' \
+           'You have been hired by ' + offer.eventLocation.customer.user.get_full_name() + '</h1>' \
+           '</br> ' \
+           '<h2 style="color: #FFFFF; font-family: Helvetica">Event information: </h2>'\
+           '<table>'
+
+    if offer.eventLocation.name is not None:
+        body += '<tr><td><b>Name event</b>:</td><td>' + offer.eventLocation.name + '</td>'
+    if offer.eventLocation.address is not None:
+        body += '<tr><td><b>Address</b>:</td><td>' + offer.eventLocation.address + '</td>'
+    if offer.eventLocation.description is not None:
+        body += '<tr><td><b>Description</b>:</td><td>' + offer.eventLocation.description + '</td>'
+
+    if offer.paymentPackage.performance is not None:
+        body += '<tr><td><b>Package selected</b>:</td><td>Performance</td>'
+        body += '<tr><td><b>Information</b>:</td><td>' + offer.paymentPackage.performance.info + '</td>'
+    elif offer.paymentPackage.performance is not None:
+        body += '<tr><td><b>Package selected</b>:</td><td>Fare</td>'
+    else:
+        body += '<tr><td><b>Package selected</b>:</td><td>Custom</td>'
+
+    body += '<tr><td><b>Date</b>:</td><td>' + offer.date.strftime('%Y-%m-%d') + '</td>'
+    body += '<tr><td><b>Duration</b>:</td><td>' + str(offer.hours) + ' hour/s</td>'
+    body += '<tr><td><b>Price</b>:</td><td>' + str(offer.price) + ' ' + str(offer.currency) + '</td>'
+
+    if offer.eventLocation.equipment is not None:
+        body += '<tr><td><b>Equipment</b>:</td><td>' + offer.eventLocation.equipment
+    else:
+        body += '<tr><td><b>Equipment</b>:</td><td> It is not necessary</td>'
+
+    body += '</table>'
+
+    body += '<h2 style="color: #FFFFF; font-family: Helvetica">Terms & conditions: </h2>'
+    body += '<p>' + system_configuration.termsText + '</p>'
+
+    email.body = body
+    email.send()            # Sending email
+
+    # Customer mail
+
+    email.to = [offer.eventLocation.customer.user.email]
+    body = '<h1 style="text-align: center; color: #FFFFF; font-family: Helvetica"> Done! You have hired ' + \
+           offer.paymentPackage.portfolio.artisticName + '!</h1>'
+    body += '<h2 style="color: #FFFFF; font-family: Helvetica">Terms & conditions: </h2>'
+    body += '<p>' + system_configuration.termsText + '</p>'
+    email.body = body
+
+    email.send()            # Sending email
+
+
+def send_email_view(request):
 
     # Form 2 (Final): calling each variable & adding a PDF file
 
-    pdf = send_mail_payment_made()
-
-    email = EmailMessage()
-    email.subject = 'Payment made'
-    email.body = 'This is the payment for your performance'                     # Aquí va el contenido HTML
-    email.from_email = 'Grooving <no-reply@grupogrooving.com>'
-    email.to = ['utri1990@gmail.com']
-    # email.attach_file('emailTesting/invoice.pdf')
-    email.attach('bill.pdf', pdf, 'application/pdf')
-    email.send()
+    send_email_pending_to_contract_made(1)
 
     return HttpResponse("Correo enviado")
 
