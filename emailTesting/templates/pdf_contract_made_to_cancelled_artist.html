@@ -211,7 +211,7 @@
     <div id="details" class="clearfix">
         <div id="client">
             <div class="to">INVOICE TO:</div>
-            <h2 class="name">{{ artist_artisticName }}</h2>
+            <h2 class="name">{{ customer_name }}</h2>
             <div class="address">{{ event_name }}</div>
             <div class="address">{{ event_address }}</div>
         </div>
@@ -231,7 +231,7 @@
         <tbody>
         <tr>
             <td class="no">1</td>
-            <td class="desc" colspan="2"><h3>Artist actuation</h3></td>
+            <td class="desc" colspan="2"><h3>Amount paid</h3></td>
             <td class="total">{{ event_total }} {{ event_currency }}</td>
         </tr>
         <tr>
@@ -245,7 +245,7 @@
             <td></td>
             <td></td>
             <td>TOTAL</td>
-            <td>{{ invoice_artist_benefit }} {{ event_currency }}</td>
+            <td>{{ invoice_customer_benefit }} {{ event_currency }}</td>
         </tr>
         </tfoot>
     </table>
