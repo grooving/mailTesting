@@ -22,7 +22,7 @@ def send_email_create_an_offer(offer_id):
     email.to = [offer.eventLocation.customer.user.email]
     email.subject = 'You has sent a offer!'
     email.body = '<h1>Your offer has been send to ' + offer.paymentPackage.portfolio.artisticName + '</h1>' + \
-                 '<p>You will receive more information soon. </p>'
+                 '<p>You will receive more information soon. </p>' + footer()
     email.send()
 
 
@@ -34,7 +34,8 @@ def send_email_pending_to_rejected(offer_id):
 
     email.to = [offer.paymentPackage.portfolio.artist.user.email]
     email.subject = 'The offer has been rejected successfully'
-    email.body = 'You have rejected the offer received from ' + offer.eventLocation.customer.user.get_full_name()
+    email.body = 'You have rejected the offer received from ' + offer.eventLocation.customer.user.get_full_name() \
+                 + footer()
     email.send()
 
     email.to = [offer.eventLocation.customer.user.email]
@@ -52,12 +53,14 @@ def send_email_pending_to_withdrawn(offer_id):
 
     email.to = [offer.paymentPackage.portfolio.artist.user.email]
     email.subject = 'The offer has been withdrawn'
-    email.body = 'We are sorry. ' + offer.eventLocation.customer.user.get_full_name() + ' has withdrawn the offer.'
+    email.body = 'We are sorry. ' + offer.eventLocation.customer.user.get_full_name() + ' has withdrawn the offer.' \
+                 + footer()
     email.send()
 
     email.to = [offer.eventLocation.customer.user.email]
     email.subject = 'The offer has been withdrawn successfully.'
-    email.body = 'You have withdrawn the offer sent to ' + offer.paymentPackage.portfolio.artisticName
+    email.body = 'You have withdrawn the offer sent to ' + offer.paymentPackage.portfolio.artisticName + "." \
+                                                                                                        + footer()
     email.send()
 
 
@@ -132,7 +135,7 @@ def send_email_pending_to_contract_made(offer_id):
                             offer.eventLocation.customer.user.get_full_name()
 
     email.to = [offer.paymentPackage.portfolio.artist.user.email]
-    email.body = render_to_string("body_pending_to_contract_made.html", context_body)
+    email.body = render_to_string("body_pending_to_contract_made.html", context_body) + footer()
     email.send()  # Sending email
 
     # Customer mail
@@ -140,7 +143,7 @@ def send_email_pending_to_contract_made(offer_id):
     context_body['title'] = 'Done! You have hired ' + offer.paymentPackage.portfolio.artisticName
 
     email.to = [offer.eventLocation.customer.user.email]
-    email.body = render_to_string("body_pending_to_contract_made.html", context_body)
+    email.body = render_to_string("body_pending_to_contract_made.html", context_body) + footer()
 
     email.send()  # Sending email
 
@@ -186,7 +189,7 @@ def send_email_contract_made_to_payment_made(offer_id):
     email.subject = offer.paymentPackage.portfolio.artisticName + ' performance is over'
     email.to = [offer.eventLocation.customer.user.email]
     email.body = '<p>We hope you enjoyed to ' + offer.paymentPackage.portfolio.artisticName + ' performance. ' \
-                 'You can rate the performance in the following link: [FRONTEND LINK]<p>'
+                 'You can rate the performance in the following link: [FRONTEND LINK]<p>' + footer()
 
     email.send()  # Sending email
 
@@ -196,7 +199,7 @@ def send_email_contract_made_to_payment_made(offer_id):
     email.to = [offer.paymentPackage.portfolio.artist.user.email]
     pdf_file = HTML(string=pdf_html).write_pdf()
     email.body = '<h1>You have received the payment in your account </h1>' \
-                 '<p>You can see the details on pdf attachment.<p>'
+                 '<p>You can see the details on pdf attachment.<p>' + footer()
     email.attach('contract.pdf', pdf_file, 'application/pdf')
     email.send()  # Sending email
 
@@ -242,7 +245,7 @@ def send_email_contract_made_to_cancelled_artist(offer_id):
     email.subject = 'The performance has been cancelled by you'
     email.to = [offer.paymentPackage.portfolio.artist.user.email]
     email.body = '<p>We are sorry that that this decision.</>' \
-                 '<p>See you soon!<p>'
+                 '<p>See you soon!<p>' + footer()
     email.send()  # Sending email
 
     # Customer mail
@@ -251,7 +254,7 @@ def send_email_contract_made_to_cancelled_artist(offer_id):
     email.to = [offer.eventLocation.customer.user.email]
     pdf_file = HTML(string=pdf_html).write_pdf()
     email.body = '<p>We are sorry that the performance has been cancelled. We proceed to return the money to your ' \
-                 'account.</p>'
+                 'account.</p>' + footer()
     email.attach('invoice.pdf', pdf_file, 'application/pdf')
     email.send()  # Sending email
 
@@ -295,7 +298,7 @@ def send_email_contract_made_to_cancelled_customer(offer_id):
     # Artist mail
 
     email.subject = 'The performance has been cancelled by ' + offer.eventLocation.customer.user.get_full_name()
-    email.to = [offer.paymentPackage.portfolio.artist.user.email]
+    email.to = ['joseph.jmlc@gmail.com']
     email.body = '<p>We are sorry that the performance has been cancelled.</p>' \
                  '<p>See you soon!</p>' + footer()
     email.send()  # Sending email
@@ -303,7 +306,7 @@ def send_email_contract_made_to_cancelled_customer(offer_id):
     # Customer mail
 
     email.subject = 'You cancelled the performance'
-    email.to = [offer.eventLocation.customer.user.email]
+    email.to = ['joseph.jmlc@gmail.com']
     pdf_file = HTML(string=pdf_html).write_pdf()
     email.body = '<p>We are sorry that this decision. We proceed to return the money to your account.</p>' + footer()
     email.attach('invoice.pdf', pdf_file, 'application/pdf')
@@ -313,7 +316,7 @@ def send_email_contract_made_to_cancelled_customer(offer_id):
 def send_email_view(request):
     # Form 2 (Final): calling each variable & adding a PDF file
 
-    send_email_contract_made_to_cancelled_customer(1)
+    send_email_pending_to_contract_made(1)
 
     return HttpResponse("Correo enviado")
 
