@@ -3,3 +3,4 @@ gunicorn
 django_heroku
 reportlab
 arrow
+Weasyprint
