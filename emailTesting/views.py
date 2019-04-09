@@ -141,7 +141,7 @@ def send_email_pending_to_contract_made(offer_id):
     # Customer mail
 
     context_body['title'] = 'Done! You have hired ' + offer.paymentPackage.portfolio.artisticName
-
+    context_body['event_payment_code'] = offer.paymentCode
     email.to = [offer.eventLocation.customer.user.email]
     email.body = render_to_string("body_pending_to_contract_made.html", context_body) + footer()
 
@@ -261,27 +261,27 @@ def send_email_contract_made_to_cancelled_artist(offer_id):
 
 def send_email_contract_made_to_cancelled_customer(offer_id):
 
-    # Entity database objects (necessary from template & email)
+    # entity database objects (necessary from template & email)
 
     offer = Offer.objects.get(pk=offer_id)
-    system_configuration = SystemConfiguration.objects.filter(pk=1).first()
+    system_configuration = Systemconfiguration.objects.filter(pk=1).first()
 
-    # Template - Artist pdf
+    # template - artist pdf
 
     artist_benefit = round(offer.price - offer.price * (system_configuration.profit / 100), 2)
 
     context_pdf = {
-        'customer_name': offer.eventLocation.customer.user.get_full_name(),
-        'artist_artisticName': offer.paymentPackage.portfolio.artisticName,
-        'artist_name': offer.paymentPackage.portfolio.artist.user.get_full_name(),
-        'event_name': offer.eventLocation.name,
-        'event_address': offer.eventLocation.address,
-        'event_corporate_email': system_configuration.corporateEmail,
-        'event_date_now': datetime.now().strftime('%Y-%m-%d %H:%M'),
+        'customer_name': offer.eventlocation.customer.user.get_full_name(),
+        'artist_artisticname': offer.paymentpackage.portfolio.artisticname,
+        'artist_name': offer.paymentpackage.portfolio.artist.user.get_full_name(),
+        'event_name': offer.eventlocation.name,
+        'event_address': offer.eventlocation.address,
+        'event_corporate_email': system_configuration.corporateemail,
+        'event_date_now': datetime.now().strftime('%y-%m-%d %h:%m'),
         'event_duration': offer.hours,
         'event_total': offer.price,
         'event_currency': offer.currency,
-        'system_configuration_terms_and_conditions': system_configuration.termsText,
+        'system_configuration_terms_and_conditions': system_configuration.termstext,
         'system_configuration_profit': system_configuration.profit.normalize(),
         'invoice_grooving_benefit': round(offer.price * (system_configuration.profit / 100), 2),
         'invoice_customer_benefit': artist_benefit,
@@ -289,34 +289,34 @@ def send_email_contract_made_to_cancelled_customer(offer_id):
 
     pdf_html = render_to_string("pdf_contract_made_to_cancelled_customer.html", context_pdf)
 
-    # Email
+    # email
 
-    email = EmailMessage()
-    email.from_email = 'Grooving <no-reply@grupogrooving.com>'
+    email = Emailmessage()
+    email.from_email = 'grooving <no-reply@grupogrooving.com>'
     email.content_subtype = 'html'
 
-    # Artist mail
+    # artist mail
 
-    email.subject = 'The performance has been cancelled by ' + offer.eventLocation.customer.user.get_full_name()
+    email.subject = 'the performance has been cancelled by ' + offer.eventlocation.customer.user.get_full_name()
     email.to = ['joseph.jmlc@gmail.com']
-    email.body = '<p>We are sorry that the performance has been cancelled.</p>' \
-                 '<p>See you soon!</p>' + footer()
-    email.send()  # Sending email
+    email.body = '<p>we are sorry that the performance has been cancelled.</p>' \
+                 '<p>see you soon!</p>' + footer()
+    email.send()  # sending email
 
-    # Customer mail
+    # customer mail
 
-    email.subject = 'You cancelled the performance'
+    email.subject = 'you cancelled the performance'
     email.to = ['joseph.jmlc@gmail.com']
     pdf_file = HTML(string=pdf_html).write_pdf()
-    email.body = '<p>We are sorry that this decision. We proceed to return the money to your account.</p>' + footer()
+    email.body = '<p>we are sorry that this decision. we proceed to return the money to your account.</p>' + footer()
     email.attach('invoice.pdf', pdf_file, 'application/pdf')
-    email.send()  # Sending email
+    email.send()  # sending email
 
 
 def send_email_view(request):
     # Form 2 (Final): calling each variable & adding a PDF file
 
-    send_email_pending_to_contract_made(1)
+    send_email_pending_to_contract_made(9)
 
     return HttpResponse("Correo enviado")
 
