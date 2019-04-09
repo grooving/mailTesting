@@ -1,43 +1,26 @@
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
-from emailTesting.models import Offer, SystemConfiguration, Artist, Customer
+from emailTesting.models import Offer, SystemConfiguration, User
 from weasyprint import HTML
 from django.template.loader import render_to_string
 from datetime import datetime
 
 
-def send_email_welcome_artist(artist_id):
+def send_email_welcome(user_id):
 
-    artist = Artist.objects.get(pk=artist_id)
-
-    email = EmailMessage()
-    email.from_email = 'Grooving <no-reply@grupogrooving.com>'
-    email.content_subtype = 'html'
-
-    email.to = [artist.user.email]
-    email.subject = "Welcome to Grooving family"
-    email.body = "<h1>Welcome to Grooving </h1> " \
-                 "<p>We are glad that you have joined our family.</p>" \
-                 "<p>Your username is: <b>" + artist.user.username + "</b> </p>" \
-                 + footer()
-
-    email.send()
-
-
-def send_email_welcome_customer(customer_id):
-
-    customer = Customer.objects.get(pk=customer_id)
+    user = User.objects.get(pk=user_id)
 
     email = EmailMessage()
     email.from_email = 'Grooving <no-reply@grupogrooving.com>'
     email.content_subtype = 'html'
 
-    email.to = [customer.user.email]
+    email.to = [user.email]
     email.subject = "Welcome to Grooving family"
     email.body = "<h1>Welcome to Grooving </h1> " \
                  "<p>We are glad that you have joined our family.</p>" \
-                 "<p>Your username is: <b>" + customer.user.username + "</b> </p>" \
+                 "<p>Your username is: <b>" + user.username + "</b> </p>" \
                  + footer()
+
     email.send()
 
 
@@ -351,7 +334,7 @@ def send_email_contract_made_to_cancelled_customer(offer_id):
 def send_email_view(request):
     # Form 2 (Final): calling each variable & adding a PDF file
 
-    send_email_welcome_customer(1)
+    send_email_welcome(1)
     # send_email_pending_to_contract_made(9)
 
     return HttpResponse("Correo enviado")
