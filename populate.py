@@ -418,9 +418,9 @@ def save_data():
     user10_customer1.save()
     user11_customer2 = User.objects.create(username='customer2', password=make_password('customer2customer2'), first_name='Jorge', last_name='Jimenez', email='utri1990@gmail.com')
     user11_customer2.save()
-    user12_customer3 = User.objects.create(username='customer3', password=make_password('customer3customer3'), first_name='Juan Manuel', last_name='Fernández', email='utri1990@gmail.com')
+    user12_customer3 = User.objects.create(username='customer3', password=make_password('customer3customer3'), first_name='Juan Manuel', last_name='Fernández', email='juancarlos.utrilla@gmail.com')
     user12_customer3.save()
-    user13_customer4 = User.objects.create(username='customer4', password=make_password('customer4customer4'), first_name='Miguel', last_name='Romero Gutierrez', email='utri1990@gmail.com') # La posada Sevilla
+    user13_customer4 = User.objects.create(username='customer4', password=make_password('customer4customer4'), first_name='Miguel', last_name='Romero Gutierrez', email='guilderwars@gmail.com') # La posada Sevilla
     user13_customer4.save()
 
     # ...admins
