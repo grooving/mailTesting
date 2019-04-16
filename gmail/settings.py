@@ -127,12 +127,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-
-# Celery
-
-# Añadimos la siguiente opción url del broker al que se conectará celery
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'
-
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

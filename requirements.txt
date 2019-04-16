@@ -3,5 +3,3 @@ gunicorn
 django_heroku
 reportlab
 Weasyprint==46
-celery
-redis
