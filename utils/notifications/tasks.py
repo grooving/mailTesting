@@ -20,7 +20,7 @@ class Notifications(threading.Thread):
     def run(self):
         msg = EmailMultiAlternatives(self.subject, self.body, self.from_email, self.recipient_list)
 
-        time.sleep(20)
+        time.sleep(40)
 
         if self.html:
             msg.attach_alternative(self.html, "text/html")
