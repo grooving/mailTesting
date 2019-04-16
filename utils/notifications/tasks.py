@@ -3,7 +3,7 @@ from emailTesting.models import Offer, SystemConfiguration, User, Artist
 from weasyprint import HTML
 from django.template.loader import render_to_string
 from datetime import datetime
-import threading
+import threading, time
 
 
 class Notifications(threading.Thread):
@@ -19,6 +19,8 @@ class Notifications(threading.Thread):
 
     def run(self):
         msg = EmailMultiAlternatives(self.subject, self.body, self.from_email, self.recipient_list)
+
+        time.sleep(20)
 
         if self.html:
             msg.attach_alternative(self.html, "text/html")
