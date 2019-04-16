@@ -196,14 +196,3 @@ class SystemConfiguration(AbstractEntity):
     slogan = models.CharField(max_length=255, blank=True, null=True)
     termsText = models.TextField(default='Terms text', max_length=255)
     privacyText = models.TextField(default='Privacy text', max_length=255)
-
-
-class EmailNotification(AbstractEntity):
-    subject = models.CharField(max_length=255)
-    body = models.TextField
-
-    def __str__(self):
-        return str(self.subject)
-from django.db import models
-
-# Create your models here.

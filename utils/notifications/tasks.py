@@ -1,44 +1,61 @@
-from django.core.mail import EmailMessage
-from emailTesting.models import Offer, SystemConfiguration, User
+from django.core.mail import EmailMessage, EmailMultiAlternatives
+from emailTesting.models import Offer, SystemConfiguration, User, Artist
 from weasyprint import HTML
 from django.template.loader import render_to_string
 from datetime import datetime
-from celery import shared_task
-# import time
+import threading
 
 
-class Notifications:
+class Notifications(threading.Thread):
+
+    def __init__(self, subject, body, from_email, recipient_list, fail_silently, html):
+        self.subject = subject
+        self.body = body
+        self.recipient_list = recipient_list
+        self.from_email = from_email
+        self.fail_silently = fail_silently
+        self.html = body
+        threading.Thread.__init__(self)
+
+    def run(self):
+        msg = EmailMultiAlternatives(self.subject, self.body, self.from_email, self.recipient_list)
+
+        if self.html:
+            msg.attach_alternative(self.html, "text/html")
+
+        msg.send(self.fail_silently)
 
     @staticmethod
-    @shared_task
+    def send_mail(subject, body, from_email, recipient_list, fail_silently=False, html=None):
+        Notifications(subject, body, from_email, recipient_list, fail_silently, html).start()
+
+    @staticmethod
     def footer():
         return render_to_string('footer_mail.html')
 
     @staticmethod
-    @shared_task
     def send_email_welcome(user_id):
 
         user = User.objects.get(pk=user_id)
 
-        email = EmailMessage()
-        email.from_email = 'Grooving <no-reply@grupogrooving.com>'
-        email.content_subtype = 'html'
+        from_email = 'Grooving <no-reply@grupogrooving.com>'
+        content_subtype = 'html'
+        to = [user.email]
+        subject = 'Welcome to Grooving family'
+        body = "<p>Hi there,</p>" \
+               "<p>Congratulations! You've signing with Grooving and are now part of a community that connects " \
+               "artists and improve their visibility in an easy, simple, simple and reliable way. " \
+               "From now, you'll get regular updates on the offers status made and all the information related" \
+               " to them. </p>" \
+               "<p>Your username is: <b>" + user.username + "</b></p>" \
+                                                            "<p>Cheers,</p>" \
+                                                            "<p>Grooving team</p>" \
+               + Notifications.footer()
 
-        email.to = [user.email]
-        email.subject = "Welcome to Grooving family"
-        email.body = "<p>Hi there,</p>" \
-                     "<p>Congratulations! You've signing with Grooving and are now part of a community that connects " \
-                     "artists and improve their visibility in an easy, simple, simple and reliable way. " \
-                     "From now, you'll get regular updates on the offers status made and all the information related" \
-                     " to them. </p>" \
-                     "<p>Your username is: <b>" + user.username + "</b></p>" \
-                                                                  "<p>Cheers,</p>" \
-                                                                  "<p>Grooving team</p>" \
-                     + Notifications.footer()
-        email.send()
+        Notifications.send_mail(subject=subject, body=body, from_email=from_email, recipient_list=to,
+                                fail_silently=True, html=content_subtype)
 
     @staticmethod
-    @shared_task
     def send_email_create_an_offer(offer_id):
         offer = Offer.objects.get(pk=offer_id)
 
@@ -61,7 +78,6 @@ class Notifications:
         email.send()
 
     @staticmethod
-    @shared_task
     def send_email_pending_to_rejected(offer_id):
         offer = Offer.objects.get(pk=offer_id)
 
@@ -85,7 +101,6 @@ class Notifications:
         email.send()
 
     @staticmethod
-    @shared_task
     def send_email_pending_to_withdrawn(offer_id):
         offer = Offer.objects.get(pk=offer_id)
 
@@ -96,7 +111,7 @@ class Notifications:
         email.to = [offer.paymentPackage.portfolio.artist.user.email]
         email.subject = 'The offer has been withdrawn'
         email.body = 'We are sorry. ' + offer.eventLocation.customer.user.get_full_name() + ' ' \
-                     'has withdrawn the offer.' + Notifications.footer()
+                                                                                            'has withdrawn the offer.' + Notifications.footer()
         email.content_subtype = 'html'
         email.send()
 
@@ -109,7 +124,6 @@ class Notifications:
         email.send()
 
     @staticmethod
-    @shared_task
     def send_email_pending_to_contract_made(offer_id):
         # Entity database objects (necessary from template & email)
         # time.sleep(20)
@@ -196,7 +210,6 @@ class Notifications:
         email.send()  # Sending email
 
     @staticmethod
-    @shared_task
     def send_email_contract_made_to_payment_made(offer_id):
 
         # Entity database objects (necessary from template & email)
@@ -238,7 +251,7 @@ class Notifications:
         email.subject = offer.paymentPackage.portfolio.artisticName + ' performance is over'
         # email.to = ['utri1990@gmail.com']
         email.to = [offer.eventLocation.customer.user.email]
-        email.body = '<p>We hope you enjoyed to ' + offer.paymentPackage.portfolio.artisticName + ' performance.<p>'\
+        email.body = '<p>We hope you enjoyed to ' + offer.paymentPackage.portfolio.artisticName + ' performance.<p>' \
                      + Notifications.footer()
 
         email.send()  # Sending email
@@ -255,7 +268,6 @@ class Notifications:
         email.send()  # Sending email
 
     @staticmethod
-    @shared_task
     def send_email_contract_made_to_cancelled_artist(offer_id):
 
         # Entity database objects (necessary from template & email)
@@ -313,7 +325,6 @@ class Notifications:
         email.send()  # Sending email
 
     @staticmethod
-    @shared_task
     def send_email_contract_made_to_cancelled_customer(offer_id):
 
         # Entity database objects (necessary from template & email)
@@ -369,3 +380,24 @@ class Notifications:
                      Notifications.footer()
         email.attach('invoice.pdf', pdf_file, 'application/pdf')
         email.send()  # Sending email
+
+    @staticmethod
+    def send_notification_for_breach_security():
+
+        # Get all system emails
+
+        emails_users = User.objects.exclude(email='').values_list('email', flat=True).distinct()
+
+        for email in emails_users:
+            email_to_send = EmailMessage()
+            email_to_send.from_email = 'Grooving <no-reply@grupogrooving.com>'
+            email_to_send.to = [email]
+            email_to_send.subject = 'Notice of data breach'
+            email_to_send.content_subtype = 'html'
+            email_to_send.body = '<p>We are writing to inform you about a data security issue that many involve ' \
+                                 'your Grooving account information. We have taken steps to secure your account ' \
+                                 'and are working closely with law enforcement.</p>' \
+                                 '<p>For security reasons, you must reset your password to protect your personal ' \
+                                 'information.</p>' + Notifications.footer()
+
+            email_to_send.send()

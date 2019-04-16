@@ -9,7 +9,8 @@ def send_email_view(request):
 
     # Notification.send_email_welcome(1)
 
-    Notifications.send_email_pending_to_contract_made.delay(9)
+    # Notifications.send_email_pending_to_contract_made(9)
+    Notifications.send_email_welcome(1)
 
     print("End at: " + time.ctime())
 

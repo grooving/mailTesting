@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'emailTesting.apps.EmailtestingConfig',
-    'djcelery',
 ]
 
 MIDDLEWARE = [
@@ -132,7 +131,7 @@ STATIC_URL = '/static/'
 # Celery
 
 # Añadimos la siguiente opción url del broker al que se conectará celery
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
