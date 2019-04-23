@@ -210,33 +210,33 @@
 <main>
     <div id="details" class="clearfix">
         <div id="client">
-            <div class="to">INVOICE TO:</div>
+            <div class="to">FACTURA PARA:</div>
             <h2 class="name">{{ customer_name }}</h2>
             <div class="address">{{ event_name }}</div>
             <div class="address">{{ event_address }}</div>
         </div>
         <div id="invoice">
-            <h1>INVOICE</h1>
-            <div class="date">Date of Invoice: {{ event_date_now }}</div>
+            <h1>FACTURA</h1>
+            <div class="date">Fecha de factura: {{ event_date_now }}</div>
         </div>
     </div>
     <table border="0" cellspacing="0" cellpadding="0">
         <thead>
         <tr>
             <th class="no">#</th>
-            <th class="desc" colspan="2">DESCRIPTION</th>
-            <th class="total">AMOUNT</th>
+            <th class="desc" colspan="2">DESCRIPCIÓN</th>
+            <th class="total">CANTIDAD</th>
         </tr>
         </thead>
         <tbody>
         <tr>
             <td class="no">1</td>
-            <td class="desc" colspan="2"><h3>Amount paid</h3></td>
+            <td class="desc" colspan="2"><h3>Cantidad pagada</h3></td>
             <td class="total">{{ event_total }} {{ event_currency }}</td>
         </tr>
         <tr>
             <td class="no">2</td>
-            <td class="desc" colspan="2"><h3>Grooving tax ({{ system_configuration_profit }}%)</h3></td>
+            <td class="desc" colspan="2"><h3>Tasa Grooving ({{ system_configuration_profit }}%)</h3></td>
             <td class="total">- {{ invoice_grooving_benefit }} {{ event_currency }}</td>
         </tr>
         </tbody>
@@ -249,7 +249,7 @@
         </tr>
         </tfoot>
     </table>
-    <div id="thanks">Thank you!</div>
+    <div id="thanks">¡Muchas gracias!</div>
 </main>
 </body>
 </html>
