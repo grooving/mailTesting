@@ -24,7 +24,7 @@
 <h1>Personal informatión</h1>
 <table>
     <tr>
-        <td><b>Full name</b>: {{ artist_fullname }}</td>
+        <td><b>Full name</b>: {{ artist.user.get_full_name }}</td>
         <td><b>Phone</b>:{% if artist.phone %}{{ artist.phone }}{% else %}Not specified{% endif %}</td>
     </tr>
     <tr>
@@ -60,7 +60,7 @@
 {% endif %}
 
 <h3>Biography</h3>
-<p>{{ artist_biography }}</p>
+<p>{{ artist.portfolio.biography }}</p>
 
 <h3>Available payment packages</h3>
 {% if not artist.portfolio.paymentPackages %}
@@ -126,6 +126,8 @@
             </tr>
         </table>
     {% endfor %}
+{% else %}
+    <p>None created</p>
 {% endif %}
 <h2>Offers received</h2>
 {% for offer in artist_offers %}
@@ -199,7 +201,7 @@
                 {% elif offer.status == "CANCELLED_ARTIST" %}
                     Cancelled for you
                 {% elif offer.status == "CANCELLED_CUSTOMER" %}
-                    Cancelado for the contractor
+                    Cancelled for the contractor
                 {% elif offer.status == "PAYMENT_MADE" %}
                     Paid
                 {% endif %}

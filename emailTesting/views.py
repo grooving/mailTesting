@@ -18,7 +18,7 @@ def send_email_view(request):
     # Notifications.send_notification_for_breach_security("Hola", "Que tal")
     # Notifications.send_email_right_to_be_forgotten("utri1990@gmail.com", "en")
     # Notifications.send_email_ban_unban_users(4)
-    Notifications.send_email_download_all_personal_data(1)
+    Notifications.send_email_download_all_personal_data(15)
 
     print("End at: " + time.ctime())
 

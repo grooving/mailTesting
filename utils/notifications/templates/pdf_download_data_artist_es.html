@@ -25,8 +25,8 @@
 <h1>Información personal</h1>
 <table>
     <tr>
-        <td><b>Nombre completo</b>: {{ artist_fullname }}</td>
-        <td><b>Teléfono</b>:{% if artist.phone %}{{ artist.phone }}{% else %}Ninguno{% endif %}</td>
+        <td><b>Nombre completo</b>: {{ artist.user.get_full_name }}</td>
+        <td><b>Teléfono</b>: {% if artist.phone %}{{ artist.phone }}{% else %}Ninguno{% endif %}</td>
     </tr>
     <tr>
         <td><b>Cuenta de paypal</b>: {% if artist.paypalAccount %}{{ artist.paypalAccount }}{% else %}Ninguno{% endif %}
@@ -61,7 +61,7 @@
 {% endif %}
 
 <h3>Biografía</h3>
-<p>{{ artist_biography }}</p>
+<p>{{ artist.portfolio.biography }}</p>
 
 <h3>Paquetes de pago disponibles</h3>
 {% if not artist.portfolio.paymentPackages %}
@@ -76,16 +76,20 @@
                 {% if payment_package.performance %}
                     <td><b>Tipo de paquete</b>: Actuación</td>
                     <td><b>Duración</b>: {{ payment_package.performance.hours }} hora/s</td>
-                    <td><b>Precio:</b> {{ payment_package.performance.price.normalize }} {{ payment_package.currency }}</td>
+                    <td><b>Precio:</b> {{ payment_package.performance.price.normalize }} {{ payment_package.currency }}
+                    </td>
                     </tr>
                     <tr>
                     <td colspan="3"><b>Información</b>: {{ payment_package.performance.info }}</td>
                 {% elif payment_package.fare %}
                     <td><b>Tipo de paquete</b>: Tarifa</td>
-                    <td><b>Precio por hora</b>: {{ payment_package.fare.priceHour.normalize }} {{ payment_package.currency }}</td>
+                    <td><b>Precio por
+                        hora</b>: {{ payment_package.fare.priceHour.normalize }} {{ payment_package.currency }}</td>
                 {% elif payment_package.custom %}
                     <td><b>Tipo de paquete</b>: Personalizado</td>
-                    <td><b>Precio mínimo</b>: {{ payment_package.custom.minimumPrice.normalize }} {{ payment_package.currency }}</td>
+                    <td><b>Precio
+                        mínimo</b>: {{ payment_package.custom.minimumPrice.normalize }} {{ payment_package.currency }}
+                    </td>
                 {% endif %}
 
                 </tr>
@@ -127,6 +131,8 @@
             </tr>
         </table>
     {% endfor %}
+{% else %}
+    <p>None created</p>
 {% endif %}
 <h2>Ofertas recibidas</h2>
 {% for offer in artist_offers %}
@@ -147,8 +153,8 @@
             <td><b>Zona</b>: {{ offer.eventLocation.zone }}</td>
         </tr>
         <tr>
-            <td colspan="2"><b>Fecha del evento</b>: {{ offer.date|date:'Y-m-d' }} a las {{ offer.date|date:'H:i' }}
-                durante {{ offer.hours }} hora/s
+            <td colspan="2"><b>Event date</b>: {{ offer.date|date:'Y-m-d' }} at {{ offer.date|date:'H:i' }}
+                for {{ offer.hours }} hour/s
             </td>
         </tr>
         {% if offer.eventLocation.equipment %}
@@ -207,16 +213,16 @@
             </td>
         </tr>
         {% if offer.status == "CONTRACT_MADE" or offer.status == "CANCELLED_ARTIST" or offer.status == "CANCELLED_CUSTOMER" or offer.status == "PAYMENT_MADE" %}
-        <tr>
-            <td colspan="2"><b>Cuenta de paypal de ingreso</b>: {{ offer.transaction.paypalArtist }}</td>
-        </tr>
+            <tr>
+                <td colspan="2"><b>Cuenta de paypal de ingreso</b>: {{ offer.transaction.paypalArtist }}</td>
+            </tr>
         {% endif %}
 
         {% if offer.status == "PAYMENT_MADE" and offer.rating %}
             {% if offer.rating.score %}
-            <tr>
-                <td><b>Puntuación recibida</b>: {{ offer.rating.score }}</td>
-            </tr>
+                <tr>
+                    <td><b>Puntuación recibida</b>: {{ offer.rating.score }}</td>
+                </tr>
             {% endif %}
             {% if offer.rating.comment %}
                 <tr>
