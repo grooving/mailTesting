@@ -2,7 +2,6 @@ from emailTesting.models import SystemConfiguration
 from django.template.loader import render_to_string
 
 # Necessary variables
-system_configuration = SystemConfiguration.objects.filter(pk=1).first()
 
 spanish = {
     "WELCOME_SUBJECT": "Bienvenido a Grooving",
@@ -14,8 +13,7 @@ spanish = {
     "BAN_UNBAN_USERS_INACTIVE_SUBJECT": "Tu cuenta de Grooving ha sido bloqueada",
     "BAN_UNBAN_USERS_INACTIVE_BODY": "<p>Hello,</p>" +
                                      "<p>Esta cuenta ha sido temporalmente desactivada por violación de los Terminos " +
-                                     "y condiciones de Grooving. Por favor, contacte con el equipo de grooving en " +
-                                     system_configuration.reportEmail + "</p>",
+                                     "y condiciones de Grooving. Por favor, contacte con el equipo de grooving en </p>",
     "BREACH_NOTIFICATION_BODY": "<p>Te informamos de que hemos detectado una brecha de seguridad en nuestro sistema " +
                                 "que afecta a la información de varias cuentas de Grooving. Hemos tomado medidas " +
                                 "para asegurar su cuenta y estamos trabajando estrechamente con las " +
@@ -42,8 +40,7 @@ english = {
     "BAN_UNBAN_USERS_INACTIVE_SUBJECT": "Your Grooving account has been banned",
     "BAN_UNBAN_USERS_INACTIVE_BODY": "<p>Hello,</p>" +
                                      "<p>This account has been temporaly banned to a violation of ours Terms & " +
-                                      "conditions. Please contact to Grooving support at " +
-                                      system_configuration.reportEmail + "</p>",
+                                      "conditions. Please contact to Grooving support at </p>",
     "BREACH_NOTIFICATION_BODY": "<p>We are writing to inform you about a data security issue that many involve " +
                                 "your Grooving account information. We have taken steps to secure your account " +
                                 "and are working closely with law enforcement.</p>",
